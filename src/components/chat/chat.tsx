@@ -1,8 +1,17 @@
-import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
+import {
+  ChangeEvent,
+  FormEvent,
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+} from 'react';
 import { IMessage } from '../../schema/schema';
 import { Message } from '../message/message';
 import { UploadButton } from '../upload-button/upload-button';
 import { Reply } from '../reply/reply';
+import { useScrollToBottom } from '../../hooks/use-scroll';
+import { convertImageToBinary, initTransaction, prepareMessage } from './utils';
 
 import s from './chat.module.scss';
 
@@ -10,21 +19,17 @@ interface ChatProps {
   title: string;
 }
 
-const initTransaction = (idb: IDBOpenDBRequest) => {
-  const request = idb.result;
-
-  const transaction = request.transaction('messages', 'readwrite');
-  const messages = transaction.objectStore('messages');
-
-  return messages;
-};
+const STORE_NAME = 'messages';
 
 export const Chat = ({ title }: ChatProps) => {
   const ref = useRef<HTMLTextAreaElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const chatRef = useRef<HTMLDivElement>(null);
 
   const [data, setData] = useState<IMessage[]>();
   const [replyMessage, setReplyMessage] = useState<IMessage>();
+
+  useScrollToBottom(chatRef.current as HTMLDivElement, data);
 
   useEffect(() => {
     const idb = indexedDB.open(title);
@@ -43,7 +48,7 @@ export const Chat = ({ title }: ChatProps) => {
     };
 
     idb.onsuccess = () => {
-      const messages = initTransaction(idb);
+      const messages = initTransaction(idb, STORE_NAME);
 
       const getAllRequest = messages.getAll();
       getAllRequest.onsuccess = () => {
@@ -52,11 +57,11 @@ export const Chat = ({ title }: ChatProps) => {
     };
   }, [title]);
 
-  const onUploadFile = () => {
+  const onUploadFile = useCallback(() => {
     if (fileRef.current) {
       fileRef.current.click();
     }
-  };
+  }, []);
 
   const onChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     if (ref.current) {
@@ -74,49 +79,12 @@ export const Chat = ({ title }: ChatProps) => {
     }
   };
 
-  const onReadImage = () => {
-    return new Promise<string>((resolve) => {
-      if (!fileRef.current?.files?.length) {
-        resolve('');
-        return;
-      }
-
-      const file = fileRef.current.files[0];
-      const reader = new FileReader();
-
-      reader.onload = (e) => {
-        if (e.target?.result) {
-          const bits = e.target.result as string;
-          resolve(bits);
-        }
-      };
-
-      reader.readAsBinaryString(file);
-    });
-  };
-
-  const normalizeMessage = (count: number, bin: string): IMessage => {
-    const username = localStorage.getItem('username') as string;
-    const text = ref.current?.value ?? '';
-    const time = new Date().toLocaleString();
-    const img = bin ? 'data:image/jpeg;base64,' + btoa(bin) : '';
-
-    return {
-      id: count + 1,
-      parentId: replyMessage?.id,
-      username,
-      text,
-      time,
-      imageUrl: img,
-    };
-  };
-
   const onAddMessage = (
     count: number,
     messages: IDBObjectStore,
     bin: string
   ) => {
-    const message = normalizeMessage(count, bin);
+    const message = prepareMessage(replyMessage?.id, count, ref.current, bin);
 
     const addMessageRequest = messages.add(message);
 
@@ -135,11 +103,11 @@ export const Chat = ({ title }: ChatProps) => {
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    const bin = await onReadImage();
+    const bin = await convertImageToBinary(fileRef.current);
     const idb = indexedDB.open(title);
 
     idb.onsuccess = () => {
-      const messages = initTransaction(idb);
+      const messages = initTransaction(idb, STORE_NAME);
       const messagesCount = messages.count();
 
       messagesCount.onsuccess = () => {
@@ -148,12 +116,15 @@ export const Chat = ({ title }: ChatProps) => {
     };
   };
 
-  const onReplyMessage = (id: number) => {
-    if (!data?.length) return;
+  const onReplyMessage = useCallback(
+    (id: number) => {
+      if (!data?.length) return;
 
-    const parentMessage = data.find((m) => m.id === id);
-    setReplyMessage(parentMessage as IMessage);
-  };
+      const parentMessage = data.find((m) => m.id === id);
+      setReplyMessage(parentMessage as IMessage);
+    },
+    [data]
+  );
 
   const onClearReplyMessage = () => {
     if (replyMessage) {
@@ -166,7 +137,7 @@ export const Chat = ({ title }: ChatProps) => {
       <div className={s.inner}>
         <h4 className={s.title}>{title}</h4>
 
-        <div className={s.chat}>
+        <div ref={chatRef} className={s.chat}>
           {data?.length
             ? data.map((m) => (
                 <Message

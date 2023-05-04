@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import cn from 'classnames';
 
 import { IMessage } from '../../schema/schema';
@@ -9,12 +10,12 @@ interface MessageProps {
   onReply: (id: number) => void;
 }
 
-export const Message = ({
-  message: { id, parentId, username, text, time, imageUrl },
-  isReplyMessage,
-  onReply,
-}: MessageProps) => {
-  return (
+export const Message = memo(
+  ({
+    message: { id, parentId, username, text, time, imageUrl },
+    isReplyMessage,
+    onReply,
+  }: MessageProps) => (
     <div className={cn(s.message, isReplyMessage && s.message_active)}>
       <div className={s.header}>
         <div className={s.meta}>
@@ -37,5 +38,5 @@ export const Message = ({
         </button>
       </div>
     </div>
-  );
-};
+  )
+);
