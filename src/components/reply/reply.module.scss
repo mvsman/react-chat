@@ -1,0 +1,22 @@
+.reply {
+  position: absolute;
+  right: 0;
+  top: -45px;
+  left: 0;
+  background-color: white;
+  opacity: 0.85;
+  font-weight: 700;
+
+  .content {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 20px;
+    border: 1px solid;
+
+    .meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+  }
+}

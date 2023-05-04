@@ -2,6 +2,7 @@ import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
 import { IMessage } from '../../schema/schema';
 import { Message } from '../message/message';
 import { UploadButton } from '../upload-button/upload-button';
+import { Reply } from '../reply/reply';
 
 import s from './chat.module.scss';
 
@@ -21,8 +22,9 @@ const initTransaction = (idb: IDBOpenDBRequest) => {
 export const Chat = ({ title }: ChatProps) => {
   const ref = useRef<HTMLTextAreaElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+
   const [data, setData] = useState<IMessage[]>();
-  const [imageUrl, setImageUrl] = useState<string>('');
+  const [replyMessage, setReplyMessage] = useState<IMessage>();
 
   useEffect(() => {
     const idb = indexedDB.open(title);
@@ -62,16 +64,20 @@ export const Chat = ({ title }: ChatProps) => {
     }
   };
 
-  const onResetRef = () => {
+  const onResetRefs = () => {
     if (ref.current) {
       ref.current.value = '';
+    }
+
+    if (fileRef.current) {
+      fileRef.current.value = '';
     }
   };
 
   const onReadImage = () => {
-    return new Promise<string>((resolve, reject) => {
+    return new Promise<string>((resolve) => {
       if (!fileRef.current?.files?.length) {
-        reject('');
+        resolve('');
         return;
       }
 
@@ -81,7 +87,6 @@ export const Chat = ({ title }: ChatProps) => {
       reader.onload = (e) => {
         if (e.target?.result) {
           const bits = e.target.result as string;
-          // setImageUrl(bits);
           resolve(bits);
         }
       };
@@ -91,14 +96,14 @@ export const Chat = ({ title }: ChatProps) => {
   };
 
   const normalizeMessage = (count: number, bin: string): IMessage => {
-    const id = count + 1;
     const username = localStorage.getItem('username') as string;
     const text = ref.current?.value ?? '';
     const time = new Date().toLocaleString();
     const img = bin ? 'data:image/jpeg;base64,' + btoa(bin) : '';
 
     return {
-      id,
+      id: count + 1,
+      parentId: replyMessage?.id,
       username,
       text,
       time,
@@ -122,7 +127,8 @@ export const Chat = ({ title }: ChatProps) => {
 
       getAllRequest.onsuccess = () => {
         setData(getAllRequest.result);
-        onResetRef();
+        onResetRefs();
+        onClearReplyMessage();
       };
     };
   };
@@ -142,13 +148,35 @@ export const Chat = ({ title }: ChatProps) => {
     };
   };
 
+  const onReplyMessage = (id: number) => {
+    if (!data?.length) return;
+
+    const parentMessage = data.find((m) => m.id === id);
+    setReplyMessage(parentMessage as IMessage);
+  };
+
+  const onClearReplyMessage = () => {
+    if (replyMessage) {
+      setReplyMessage(undefined);
+    }
+  };
+
   return (
     <div className={s.wrapper}>
       <div className={s.inner}>
         <h4 className={s.title}>{title}</h4>
 
         <div className={s.chat}>
-          {data?.length && data.map((m) => <Message key={m.id} message={m} />)}
+          {data?.length
+            ? data.map((m) => (
+                <Message
+                  key={m.id}
+                  message={m}
+                  isReplyMessage={replyMessage?.id === m.id}
+                  onReply={onReplyMessage}
+                />
+              ))
+            : null}
         </div>
 
         <form className={s.form} onSubmit={onSubmit}>
@@ -164,6 +192,10 @@ export const Chat = ({ title }: ChatProps) => {
               Отправить
             </button>
           </div>
+
+          {replyMessage && (
+            <Reply message={replyMessage} onCancel={onClearReplyMessage} />
+          )}
         </form>
       </div>
     </div>

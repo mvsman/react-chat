@@ -1,13 +1,28 @@
 .message {
   border: 1px solid;
+  border-radius: 8px;
   padding: 5px 10px;
   display: flex;
   flex-direction: column;
   gap: 10px;
 
+  &_active {
+    box-shadow: 0px 0px 2px 2px darkblue;
+    border-color: darkblue;
+  }
+
   .header {
     display: flex;
     justify-content: space-between;
+
+    .meta {
+      display: flex;
+      gap: 5px;
+    }
+
+    .username {
+      font-weight: 600;
+    }
   }
 
   .body {
@@ -16,17 +31,17 @@
     flex-direction: column;
 
     .text {
+      font-style: italic;
       flex-grow: 1;
     }
 
     .image {
-      max-width: 500px;
-      object-fit: cover;
+      max-height: 300px;
+      object-fit: contain;
       flex: 60%;
-      margin: 0 auto;
     }
 
-    .response {
+    .button {
       align-self: flex-end;
     }
   }
