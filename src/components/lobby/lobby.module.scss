@@ -1,0 +1,33 @@
+.lobby {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 15px;
+  width: 60%;
+  padding: 40px;
+  border: 1px solid;
+
+  .field {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
+
+    .input {
+      flex-grow: 1;
+      padding: 5px;
+    }
+  }
+}
+
+.submit {
+  padding: 5px;
+}
