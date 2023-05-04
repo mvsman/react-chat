@@ -1,6 +1,8 @@
 import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
 import { IMessage } from '../../schema/schema';
 import { Message } from '../message/message';
+import { UploadButton } from '../upload-button/upload-button';
+
 import s from './chat.module.scss';
 
 interface ChatProps {
@@ -157,21 +159,7 @@ export const Chat = ({ title }: ChatProps) => {
             onChange={onChange}
           />
           <div className={s.buttons}>
-            <div className={s.file}>
-              <button
-                className={s.file_button}
-                type="button"
-                onClick={onUploadFile}
-              >
-                Прикрепить png/jpg
-              </button>
-              <input
-                className={s.file_input}
-                ref={fileRef}
-                type="file"
-                accept="image/png, image/jpg, image/jpeg"
-              />
-            </div>
+            <UploadButton ref={fileRef} onUploadFile={onUploadFile} />
             <button className={s.submit} type="submit">
               Отправить
             </button>
