@@ -1,4 +1,5 @@
 import { IMessage } from '../../schema/schema';
+import { LS_USERNAME_KEY } from '../const/index';
 
 export const initTransaction = (idb: IDBOpenDBRequest, name: string) => {
   const request = idb.result;
@@ -36,7 +37,7 @@ export const prepareMessage = (
   input: HTMLTextAreaElement | null,
   bin: string
 ): IMessage => {
-  const username = localStorage.getItem('username') as string;
+  const username = localStorage.getItem(LS_USERNAME_KEY) as string;
   const text = input?.value ?? '';
   const time = new Date().toLocaleString();
   const imageUrl = bin ? 'data:image/jpeg;base64,' + btoa(bin) : '';

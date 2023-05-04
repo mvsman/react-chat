@@ -3,6 +3,7 @@ import { IMessage } from '../../schema/schema';
 import { Message } from '../message/message';
 import { ChatForm, ChatFormRefs } from '../chat-form/chat-form';
 import { useScrollToBottom } from '../../hooks/use-scroll';
+import { STORE_NAME } from '../const/index';
 import { convertImageToBinary, initTransaction, prepareMessage } from './utils';
 
 import s from './chat.module.scss';
@@ -10,8 +11,6 @@ import s from './chat.module.scss';
 interface ChatProps {
   title: string;
 }
-
-const STORE_NAME = 'messages';
 
 export const Chat = ({ title }: ChatProps) => {
   const childRef = useRef<ChatFormRefs>(null);
@@ -74,6 +73,14 @@ export const Chat = ({ title }: ChatProps) => {
     }
   }, [replyMessage]);
 
+  const onScrollToParentMessage = (parentId: number) => {
+    const parentMessage = document.querySelector(`[data-id="${parentId}"]`);
+
+    if (parentMessage) {
+      parentMessage.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   const onAddMessage = useCallback(
     (count: number, messages: IDBObjectStore, bin: string) => {
       const message = prepareMessage(
@@ -86,11 +93,6 @@ export const Chat = ({ title }: ChatProps) => {
       const addMessageRequest = messages.add(message);
 
       addMessageRequest.onsuccess = () => {
-        console.log(
-          'Сообщение добавлено в хранилище',
-          addMessageRequest.result
-        );
-
         const getAllRequest = messages.getAll();
 
         getAllRequest.onsuccess = () => {
@@ -134,6 +136,7 @@ export const Chat = ({ title }: ChatProps) => {
                   message={m}
                   isReplyMessage={replyMessage?.id === m.id}
                   onReply={onReplyMessage}
+                  onScrollToParentMessage={onScrollToParentMessage}
                 />
               ))
             : null}

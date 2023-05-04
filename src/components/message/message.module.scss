@@ -23,6 +23,17 @@
     .username {
       font-weight: 600;
     }
+
+    .reply {
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      transition: color 0.15s;
+      cursor: pointer;
+
+      &:hover {
+        color: darkblue;
+      }
+    }
   }
 
   .body {
@@ -43,6 +54,7 @@
 
     .button {
       align-self: flex-end;
+      cursor: pointer;
     }
   }
 }

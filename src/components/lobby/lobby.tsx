@@ -1,21 +1,8 @@
 import { ChangeEvent, FormEvent, useState } from 'react';
+import { LS_USERNAME_KEY } from '../const/index';
+import { options } from './utils';
 
 import s from './lobby.module.scss';
-
-const options = [
-  {
-    label: 'Комната 1',
-    value: 'room1',
-  },
-  {
-    label: 'Комната 2',
-    value: 'room2',
-  },
-  {
-    label: 'Комната 3',
-    value: 'room3',
-  },
-];
 
 const rooms = options.map(({ label, value }) => (
   <option key={label} value={value}>
@@ -44,7 +31,7 @@ export const Lobby = () => {
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
 
-    localStorage.setItem('username', username);
+    localStorage.setItem(LS_USERNAME_KEY, username);
 
     const route = `${window.location.href}${room}`;
     window.open(route, '_blank');
@@ -54,7 +41,7 @@ export const Lobby = () => {
     <div className={s.lobby}>
       <form className={s.form} onSubmit={onSubmit}>
         <label className={s.field} htmlFor="username">
-          <span>Введитие свое имя</span>
+          <span>Введите свое имя</span>
           <input
             className={s.input}
             type="text"

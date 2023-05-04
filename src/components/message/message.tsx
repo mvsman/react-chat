@@ -8,6 +8,7 @@ interface MessageProps {
   message: IMessage;
   isReplyMessage?: boolean;
   onReply: (id: number) => void;
+  onScrollToParentMessage: (parentId: number) => void;
 }
 
 export const Message = memo(
@@ -15,14 +16,21 @@ export const Message = memo(
     message: { id, parentId, username, text, time, imageUrl },
     isReplyMessage,
     onReply,
+    onScrollToParentMessage,
   }: MessageProps) => (
-    <div className={cn(s.message, isReplyMessage && s.message_active)}>
+    <div
+      data-id={id}
+      className={cn(s.message, isReplyMessage && s.message_active)}
+    >
       <div className={s.header}>
         <div className={s.meta}>
           <span>({id})</span>
           <span className={s.username}>{username}</span>
           {parentId && (
-            <span className={s.reply}>
+            <span
+              className={s.reply}
+              onClick={() => onScrollToParentMessage(parentId)}
+            >
               Ответ на сообщение: ({parentId}){' '}
               <span className={s.username}>{username}</span>
             </span>
