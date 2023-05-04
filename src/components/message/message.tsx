@@ -1,4 +1,4 @@
-import { Message as IMessage } from '../../schema/schema';
+import { IMessage } from '../../schema/schema';
 import s from './message.module.scss';
 
 interface MessageProps {

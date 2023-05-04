@@ -1,5 +1,5 @@
 import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
-import { Message as IMessage } from '../../schema/schema';
+import { IMessage } from '../../schema/schema';
 import { Message } from '../message/message';
 import s from './chat.module.scss';
 
@@ -66,20 +66,50 @@ export const Chat = ({ title }: ChatProps) => {
     }
   };
 
-  const onAddMessage = (count: number, messages: IDBObjectStore) => {
-    const id = String(count + 1);
+  const onReadImage = () => {
+    return new Promise<string>((resolve, reject) => {
+      if (!fileRef.current?.files?.length) {
+        reject('');
+        return;
+      }
+
+      const file = fileRef.current.files[0];
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          const bits = e.target.result as string;
+          // setImageUrl(bits);
+          resolve(bits);
+        }
+      };
+
+      reader.readAsBinaryString(file);
+    });
+  };
+
+  const normalizeMessage = (count: number, bin: string): IMessage => {
+    const id = count + 1;
     const username = localStorage.getItem('username') as string;
     const text = ref.current?.value ?? '';
     const time = new Date().toLocaleString();
-    console.log(imageUrl);
+    const img = bin ? 'data:image/jpeg;base64,' + btoa(bin) : '';
 
-    const message: IMessage = {
+    return {
       id,
       username,
       text,
       time,
-      imageUrl,
+      imageUrl: img,
     };
+  };
+
+  const onAddMessage = (
+    count: number,
+    messages: IDBObjectStore,
+    bin: string
+  ) => {
+    const message = normalizeMessage(count, bin);
 
     const addMessageRequest = messages.add(message);
 
@@ -95,26 +125,17 @@ export const Chat = ({ title }: ChatProps) => {
     };
   };
 
-  const onSubmit = (e: FormEvent) => {
+  const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
-
-    if (fileRef.current?.files) {
-      const img = URL.createObjectURL(fileRef.current.files[0]);
-      setImageUrl(img);
-    }
-
+    const bin = await onReadImage();
     const idb = indexedDB.open(title);
 
     idb.onsuccess = () => {
-      // const request = idb.result;
-
-      // const transaction = request.transaction('messages', 'readwrite');
-      // const messages = transaction.objectStore('messages');
       const messages = initTransaction(idb);
       const messagesCount = messages.count();
 
       messagesCount.onsuccess = () => {
-        onAddMessage(messagesCount.result, messages);
+        onAddMessage(messagesCount.result, messages, bin);
       };
     };
   };
