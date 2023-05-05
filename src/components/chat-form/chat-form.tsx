@@ -1,72 +1,46 @@
-import {
-  ChangeEvent,
-  FormEvent,
-  forwardRef,
-  useCallback,
-  useImperativeHandle,
-  useRef,
-  memo,
-} from 'react';
-import { IMessage } from '../../schema/schema';
-import { Reply } from '../reply/reply';
-import { UploadButton } from '../upload-button/upload-button';
+import { ChangeEvent, FormEvent, useCallback, memo } from 'react';
+import { getReplyMessage, chatActions, addMessage } from '../../store/chat';
+import { getMessageText, messageActions } from '../../store/message';
+import { useAppDispatch, useAppSelector } from '../../store/store';
+import { convertImageToBinary } from './utils';
 
-import s from './chat-form.module.scss';
+import { ChatFormView } from './chat-form-view';
 
-export interface ChatFormRefs {
-  textareaRef: HTMLTextAreaElement | null;
-  fileRef: HTMLInputElement | null;
-}
+export const ChatForm = memo(() => {
+  const dispatch = useAppDispatch();
 
-interface ChatFormProps {
-  replyMessage?: IMessage;
-  onClearReplyMessage: () => void;
-  onSubmit: (e: FormEvent) => Promise<void>;
-}
+  const text = useAppSelector(getMessageText);
+  const replyMessage = useAppSelector(getReplyMessage);
 
-export const ChatForm = memo(
-  forwardRef<ChatFormRefs, ChatFormProps>(
-    ({ replyMessage, onClearReplyMessage, onSubmit }, forwardedRef) => {
-      const textareaRef = useRef<HTMLTextAreaElement>(null);
-      const fileRef = useRef<HTMLInputElement>(null);
+  const handleRemoveReplyMessage = useCallback(() => {
+    dispatch(chatActions.removeReplyMessage());
+  }, [dispatch]);
 
-      useImperativeHandle(forwardedRef, () => ({
-        textareaRef: textareaRef.current,
-        fileRef: fileRef.current,
-      }));
+  const handleChangeText = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    dispatch(messageActions.setMessageText(e.target.value));
+  };
 
-      const onUploadFile = useCallback(() => {
-        if (fileRef.current) {
-          fileRef.current.click();
-        }
-      }, []);
-
-      const onChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-        if (textareaRef.current) {
-          textareaRef.current.value = e.target.value;
-        }
-      };
-
-      return (
-        <form className={s.form} onSubmit={onSubmit}>
-          <textarea
-            className={s.field}
-            ref={textareaRef}
-            placeholder="Введите ваше сообщение"
-            onChange={onChange}
-          />
-          <div className={s.buttons}>
-            <UploadButton ref={fileRef} onUploadFile={onUploadFile} />
-            <button className={s.submit} type="submit">
-              Отправить
-            </button>
-          </div>
-
-          {replyMessage && (
-            <Reply message={replyMessage} onCancel={onClearReplyMessage} />
-          )}
-        </form>
-      );
+  const handleChangeFile = async (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const [image] = e.target.files;
+      const bin = await convertImageToBinary(image);
+      dispatch(messageActions.setMessageImageUrl(bin));
     }
-  )
-);
+  };
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    dispatch(addMessage());
+  };
+
+  return (
+    <ChatFormView
+      text={text}
+      replyMessage={replyMessage}
+      onRemoveReplyMessage={handleRemoveReplyMessage}
+      onChangeText={handleChangeText}
+      onChangeFile={handleChangeFile}
+      onSubmit={handleSubmit}
+    />
+  );
+});
