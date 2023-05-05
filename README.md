@@ -1,6 +1,6 @@
 # react-chat
 
-Local chat on React/TS, with localStorage + indexedDB
+Local chat on React/TS/Redux, with localStorage + Dexie.js (indexedDB)
 
 _______
 
