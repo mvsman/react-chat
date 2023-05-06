@@ -1,26 +1,7 @@
-import {
-  createEntityAdapter,
-  createSlice,
-  EntityState,
-  PayloadAction,
-} from '@reduxjs/toolkit';
-import { RootState } from '../store';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { IMessage } from '../../schema/schema';
 import { addMessage } from './actions';
-
-interface ChatState extends EntityState<IMessage> {
-  status: 'idle' | 'loading' | 'error' | 'success';
-  errorMessage?: string;
-  replyMessage?: IMessage;
-}
-
-const chatAdapter = createEntityAdapter<IMessage>({
-  selectId: (message) => message.id,
-});
-
-export const getChat = chatAdapter.getSelectors<RootState>(
-  (state) => state.chat || chatAdapter.getInitialState()
-);
+import { chatAdapter, ChatState } from './utils';
 
 export const chatSlice = createSlice({
   name: 'chat',
@@ -32,6 +13,9 @@ export const chatSlice = createSlice({
   reducers: {
     messagesReceived: (state, action: PayloadAction<IMessage[]>) => {
       chatAdapter.setAll(state, action.payload);
+    },
+    setChatRoom: (state, action: PayloadAction<string>) => {
+      state.room = action.payload;
     },
     setReplyMessage: (state, action: PayloadAction<number>) => {
       const parentId = state.entities[action.payload]?.id;

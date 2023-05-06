@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 
-import { db } from '../../db/db';
+import { roomDB } from '../../db/db';
 import { IMessage } from '../../schema/schema';
 import { messageActions } from '../message';
 import { AsyncThunkConfig } from '../store';
@@ -9,7 +9,7 @@ import { chatActions } from './slice';
 export const addMessage = createAsyncThunk<IMessage, void, AsyncThunkConfig>(
   'chat/addMessage',
   async (_, { rejectWithValue, getState, dispatch }) => {
-    const messageCount = await db.messages.count();
+    const messageCount = await roomDB.messages.count();
     const parentId = getState().chat.replyMessage?.id;
     const { username, text, imageUrl } = getState().message;
 
@@ -26,7 +26,7 @@ export const addMessage = createAsyncThunk<IMessage, void, AsyncThunkConfig>(
       return rejectWithValue('Не удалось отправить сообщение');
     }
 
-    await db.messages.add(message);
+    await roomDB.messages.add(message);
 
     dispatch(messageActions.resetMessageContent());
 

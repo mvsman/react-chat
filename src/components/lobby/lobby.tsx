@@ -1,74 +1,68 @@
 import { ChangeEvent, FormEvent, useState } from 'react';
-import { LS_USERNAME_KEY } from '../const/index';
 import { options } from './utils';
 
 import s from './lobby.module.scss';
-
-const rooms = options.map(({ label, value }) => (
-  <option key={label} value={value}>
-    {label}
-  </option>
-));
+import { Modal } from '../ui/modal/modal';
+import { LoginForm } from '../login-form/login-form';
+import { useAppDispatch, useAppSelector } from '../../store/store';
+import {
+  addUser,
+  getUserErrorMessage,
+  getUserPassword,
+  getUsername,
+  userActions,
+} from '../../store/user';
+import { chatActions } from '../../store/chat';
+import { room } from '../../helpers/room';
+import { LoginModal } from '../login-modal/login-modal';
 
 export const Lobby = () => {
-  const [username, setUsername] = useState<string>('');
-  const [room, setRoom] = useState<string>(options[0].value);
+  const dispatch = useAppDispatch();
+  const [showModal, setShowModal] = useState<boolean>(true);
 
-  const onChangeRoom = (e: ChangeEvent<HTMLSelectElement>) => {
-    setRoom(e.target.value);
+  const username = useAppSelector(getUsername);
+  const password = useAppSelector(getUserPassword);
+
+  const handleChangeUsername = (e: ChangeEvent<HTMLInputElement>) => {
+    dispatch(userActions.setUsername(e.target.value));
   };
 
-  const onChangeUsername = (e: ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
-
-    if (value.trim()) {
-      setUsername(value);
-    } else {
-      setUsername('');
-    }
+  const handleChangePassword = (e: ChangeEvent<HTMLInputElement>) => {
+    dispatch(userActions.setPassword(e.target.value));
   };
 
-  const onSubmit = (e: FormEvent) => {
+  const handleChangeRoom = (e: ChangeEvent<HTMLSelectElement>) => {
+    dispatch(chatActions.setChatRoom(e.target.value));
+  };
+
+  const handleRoomEntry = (e: FormEvent) => {
     e.preventDefault();
-
-    localStorage.setItem(LS_USERNAME_KEY, username);
-
     const route = `${window.location.href}${room}`;
     window.open(route, '_blank');
   };
 
   return (
-    <div className={s.lobby}>
-      <form className={s.form} onSubmit={onSubmit}>
-        <label className={s.field} htmlFor="username">
-          <span>Введите свое имя</span>
-          <input
-            className={s.input}
-            type="text"
-            id="username"
-            name="username"
-            placeholder="Поле обязательно для заполнения"
-            value={username}
-            onChange={onChangeUsername}
+    <>
+      <div className={s.lobby}>
+        <div className={s.login}>
+          <LoginForm
+            submitText="Войти в комнату"
+            username={username}
+            password={password}
+            onChangeUsername={handleChangeUsername}
+            onChangePassword={handleChangePassword}
+            onSubmit={handleRoomEntry}
           />
-        </label>
-
-        <label className={s.field} htmlFor="room">
-          <span>Выберите комнату</span>
-          <select
-            className={s.input}
-            id="room"
-            name="room"
-            value={room}
-            onChange={onChangeRoom}
+          <button
+            className={s.reg}
+            type="button"
+            onClick={() => setShowModal(true)}
           >
-            {rooms}
-          </select>
-        </label>
-        <button className={s.submit} type="submit" disabled={!username}>
-          Войти в комнату
-        </button>
-      </form>
-    </div>
+            Нет аккаунта? Зарегистрироваться
+          </button>
+        </div>
+      </div>
+      <LoginModal showModal={showModal} onClose={() => setShowModal(false)} />
+    </>
   );
 };

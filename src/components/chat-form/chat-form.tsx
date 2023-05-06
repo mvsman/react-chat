@@ -1,20 +1,17 @@
-import { ChangeEvent, FormEvent, useCallback, memo } from 'react';
-import { getReplyMessage, chatActions, addMessage } from '../../store/chat';
-import { getMessageText, messageActions } from '../../store/message';
-import { useAppDispatch, useAppSelector } from '../../store/store';
+import { ChangeEvent, FormEvent } from 'react';
+import { chatActions, addMessage } from '../../store/chat';
+import { messageActions } from '../../store/message';
+import { useAppDispatch } from '../../store/store';
 import { convertImageToBinary } from './utils';
 
 import { ChatFormView } from './chat-form-view';
 
-export const ChatForm = memo(() => {
+export const ChatForm = () => {
   const dispatch = useAppDispatch();
 
-  const text = useAppSelector(getMessageText);
-  const replyMessage = useAppSelector(getReplyMessage);
-
-  const handleRemoveReplyMessage = useCallback(() => {
+  const handleRemoveReplyMessage = () => {
     dispatch(chatActions.removeReplyMessage());
-  }, [dispatch]);
+  };
 
   const handleChangeText = (e: ChangeEvent<HTMLTextAreaElement>) => {
     dispatch(messageActions.setMessageText(e.target.value));
@@ -35,12 +32,10 @@ export const ChatForm = memo(() => {
 
   return (
     <ChatFormView
-      text={text}
-      replyMessage={replyMessage}
       onRemoveReplyMessage={handleRemoveReplyMessage}
       onChangeText={handleChangeText}
       onChangeFile={handleChangeFile}
       onSubmit={handleSubmit}
     />
   );
-});
+};

@@ -1,0 +1,11 @@
+.field {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 10px;
+
+  .input {
+    flex-grow: 1;
+    padding: 5px;
+  }
+}
