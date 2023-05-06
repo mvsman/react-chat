@@ -3,7 +3,19 @@
   flex-direction: column;
   justify-content: center;
   gap: 15px;
-  width: 100%;
+  width: 60%;
+  padding: 40px;
+  border: 1px solid;
+
+  .reg {
+    padding: 5px;
+    cursor: pointer;
+  }
+
+  .error {
+    text-align: center;
+    color: darkred;
+  }
 }
 
 .submit {

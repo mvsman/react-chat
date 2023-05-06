@@ -1,8 +1,10 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
+import { LS_USERNAME_KEY } from '../../components/const';
 
 import { usersDB } from '../../db/db';
-import { IUser } from '../../schema/schema';
+import { IUser, ValidationError } from '../../schema/schema';
 import { AsyncThunkConfig } from '../store';
+import { userActions } from './slice';
 
 export const addUser = createAsyncThunk<void, IUser, AsyncThunkConfig>(
   'user/addUser',
@@ -13,7 +15,7 @@ export const addUser = createAsyncThunk<void, IUser, AsyncThunkConfig>(
       const hasUser = users.some((u) => u.username === username);
 
       if (hasUser) {
-        return rejectWithValue('Пользователь с таким именем уже существует!');
+        return rejectWithValue(ValidationError.USERNAME_IS_BUSY);
       }
 
       const usersCount = await usersDB.users.count();
@@ -24,7 +26,7 @@ export const addUser = createAsyncThunk<void, IUser, AsyncThunkConfig>(
         password,
       });
     } catch (error) {
-      return rejectWithValue('Ошибка');
+      return rejectWithValue(ValidationError.ERROR);
     }
   }
 );
@@ -33,18 +35,29 @@ export const checkUserIsRegistered = createAsyncThunk<
   boolean,
   IUser,
   AsyncThunkConfig
->('user/checkUserIsRegistered', async (_, { rejectWithValue, getState }) => {
-  try {
+>(
+  'user/checkUserIsRegistered',
+  async ({ username, password }, { rejectWithValue, dispatch }) => {
     const users = await usersDB.users.toArray();
 
-    const { username, password } = getState().user;
+    const isCorrectUsername = users.some((u) => u.username === username);
+    const isCorrectPassword = users.some((u) => u.password === password);
+
+    if (isCorrectUsername && !isCorrectPassword) {
+      dispatch(userActions.setUserIsRegistered(true));
+      return rejectWithValue(ValidationError.INCORRECT_PASSWORD);
+    }
 
     const hasUser = users.some(
       (u) => u.username === username && u.password === password
     );
 
-    return hasUser;
-  } catch (error) {
-    return rejectWithValue('Ошибка');
+    if (!hasUser) {
+      return rejectWithValue(ValidationError.INCORRECT_USERNAME);
+    }
+
+    localStorage.setItem(LS_USERNAME_KEY, username);
+
+    return true;
   }
-});
+);

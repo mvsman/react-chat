@@ -1,8 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { LS_USERNAME_KEY } from '../../components/const';
 import { IMessage } from '../../schema/schema';
+
+const username = localStorage.getItem(LS_USERNAME_KEY) as string;
 
 const initialState: IMessage = {
   id: 0,
+  username,
 };
 
 export const messageSlice = createSlice({

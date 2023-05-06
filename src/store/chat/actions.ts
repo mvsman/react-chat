@@ -6,34 +6,43 @@ import { messageActions } from '../message';
 import { AsyncThunkConfig } from '../store';
 import { chatActions } from './slice';
 
+export const messagesReceived = createAsyncThunk<IMessage[], void>(
+  'chat/messagesReceived',
+  async () => {
+    const messages = await roomDB.messages.toArray();
+
+    return messages;
+  }
+);
+
 export const addMessage = createAsyncThunk<IMessage, void, AsyncThunkConfig>(
   'chat/addMessage',
   async (_, { rejectWithValue, getState, dispatch }) => {
-    const messageCount = await roomDB.messages.count();
-    const parentId = getState().chat.replyMessage?.id;
-    const { username, text, imageUrl } = getState().message;
+    try {
+      const messageCount = await roomDB.messages.count();
+      const parentId = getState().chat.replyMessage?.id;
+      const { username, text, imageUrl } = getState().message;
 
-    const message = {
-      id: messageCount + 1,
-      parentId,
-      username,
-      text,
-      time: new Date().toLocaleString(),
-      imageUrl,
-    };
+      const message = {
+        id: messageCount + 1,
+        parentId,
+        username,
+        text,
+        time: new Date().toLocaleString(),
+        imageUrl,
+      };
 
-    if (!message) {
+      await roomDB.messages.add(message);
+
+      dispatch(messageActions.resetMessageContent());
+
+      if (parentId) {
+        dispatch(chatActions.removeReplyMessage());
+      }
+
+      return message;
+    } catch (error) {
       return rejectWithValue('Не удалось отправить сообщение');
     }
-
-    await roomDB.messages.add(message);
-
-    dispatch(messageActions.resetMessageContent());
-
-    if (parentId) {
-      dispatch(chatActions.removeReplyMessage());
-    }
-
-    return message;
   }
 );

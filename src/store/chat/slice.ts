@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { IMessage } from '../../schema/schema';
-import { addMessage } from './actions';
+import { addMessage, messagesReceived } from './actions';
 import { chatAdapter, ChatState } from './utils';
 
 export const chatSlice = createSlice({
@@ -11,9 +11,6 @@ export const chatSlice = createSlice({
     status: 'idle',
   }),
   reducers: {
-    messagesReceived: (state, action: PayloadAction<IMessage[]>) => {
-      chatAdapter.setAll(state, action.payload);
-    },
     setChatRoom: (state, action: PayloadAction<string>) => {
       state.room = action.payload;
     },
@@ -42,6 +39,20 @@ export const chatSlice = createSlice({
         }
       )
       .addCase(addMessage.pending, (state) => {
+        state.status = 'loading';
+      })
+
+      .addCase(messagesReceived.rejected, (state) => {
+        state.status = 'error';
+      })
+      .addCase(
+        messagesReceived.fulfilled,
+        (state, action: PayloadAction<IMessage[]>) => {
+          state.status = 'success';
+          chatAdapter.setAll(state, action.payload);
+        }
+      )
+      .addCase(messagesReceived.pending, (state) => {
         state.status = 'loading';
       });
   },

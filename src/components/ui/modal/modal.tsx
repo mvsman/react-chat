@@ -1,6 +1,8 @@
-import { KeyboardEvent, MouseEvent, ReactNode } from 'react';
-import s from './modal.module.scss';
+import { ReactNode } from 'react';
+
 import { Portal } from './portal';
+
+import s from './modal.module.scss';
 
 interface ModalProps {
   children: ReactNode;
@@ -9,22 +11,11 @@ interface ModalProps {
 }
 
 export const Modal = ({ children, isOpen, onClose }: ModalProps) => {
-  const handleClose = (
-    e: KeyboardEvent<HTMLDivElement> | MouseEvent<HTMLDivElement>
-  ) => {
-    if ('key' in e && e.key === 'Enter') {
-      onClose();
-      return;
-    }
-
-    onClose();
-  };
-
   if (!isOpen) return null;
 
   return (
     <Portal>
-      <div className={s.modal} onClick={handleClose}>
+      <div className={s.modal} onClick={onClose}>
         <div className={s.overlay}>
           <div className={s.content} onClick={(e) => e.stopPropagation()}>
             {children}

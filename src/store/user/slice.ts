@@ -19,6 +19,9 @@ export const userSlice = createSlice({
     setPassword: (state, action: PayloadAction<string>) => {
       state.password = action.payload;
     },
+    setUserIsRegistered: (state, action: PayloadAction<boolean>) => {
+      state.userIsRegistered = action.payload;
+    },
     logout: (state) => {
       state.username = '';
       state.password = '';
@@ -47,6 +50,8 @@ export const userSlice = createSlice({
       })
       .addCase(checkUserIsRegistered.pending, (state) => {
         state.status = 'loading';
+        state.errorMessage = '';
+        state.userIsRegistered = false;
       });
   },
 });

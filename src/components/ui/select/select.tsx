@@ -13,11 +13,11 @@ interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   options: SelectOption[];
 }
 
-export const Select = ({ id, label, options }: SelectProps) => {
+export const Select = ({ id, label, options, ...props }: SelectProps) => {
   return (
     <label className={s.field} htmlFor={id}>
       {label && <span>{label}</span>}
-      <select className={s.input} id={id}>
+      <select className={s.input} id={id} {...props}>
         {options.map(({ label, value }) => (
           <option key={value} value={value}>
             {label}
