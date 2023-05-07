@@ -24,6 +24,9 @@ export const messageSlice = createSlice({
       state.imageUrl = '';
       state.text = '';
     },
+    resetMessageImage: (state) => {
+      state.imageUrl = '';
+    },
   },
 });
 

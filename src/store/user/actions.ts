@@ -56,7 +56,7 @@ export const checkUserIsRegistered = createAsyncThunk<
       return rejectWithValue(ValidationError.INCORRECT_USERNAME);
     }
 
-    localStorage.setItem(LS_USERNAME_KEY, username);
+    localStorage.setItem(LS_USERNAME_KEY, username as string);
 
     return true;
   }

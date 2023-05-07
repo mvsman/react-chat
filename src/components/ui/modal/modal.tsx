@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 
-import { Portal } from './portal';
+import { Portal } from '../portal/portal';
 
 import s from './modal.module.scss';
 

@@ -6,14 +6,12 @@ import { LoginModal } from '../login-modal/login-modal';
 import s from './lobby.module.scss';
 
 export const Lobby = () => {
-  const [showModal, setShowModal] = useState<boolean>(true);
+  const [showModal, setShowModal] = useState<boolean>(false);
 
   return (
     <>
       <div className={s.lobby}>
-        {/* <div className={s.login}> */}
         <LoginForm onOpenModal={() => setShowModal(true)} />
-        {/* </div> */}
       </div>
       <LoginModal showModal={showModal} onClose={() => setShowModal(false)} />
     </>

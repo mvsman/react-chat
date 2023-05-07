@@ -3,7 +3,6 @@ import cn from 'classnames';
 
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { getUserErrorMessage, checkUserIsRegistered } from '../../store/user';
-import { chatActions, getChatRoom } from '../../store/chat';
 import { Input } from '../ui/input/input';
 import { Select } from '../ui/select/select';
 
@@ -33,11 +32,9 @@ export const LoginForm = ({ className, onOpenModal }: LoginFormProps) => {
   const dispatch = useAppDispatch();
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-
-  const disabled = !username || !password;
+  const [room, setRoom] = useState<string>(options[0].value);
 
   const errorMessage = useAppSelector(getUserErrorMessage);
-  const room = useAppSelector(getChatRoom);
 
   const onChangeUsername = (e: ChangeEvent<HTMLInputElement>) => {
     setUsername(e.target.value);
@@ -48,7 +45,7 @@ export const LoginForm = ({ className, onOpenModal }: LoginFormProps) => {
   };
 
   const onChangeRoom = (e: ChangeEvent<HTMLSelectElement>) => {
-    dispatch(chatActions.setChatRoom(e.target.value));
+    setRoom(e.target.value);
   };
 
   const onRoomEntry = (e: FormEvent) => {
@@ -85,7 +82,11 @@ export const LoginForm = ({ className, onOpenModal }: LoginFormProps) => {
         onChange={onChangeRoom}
       />
 
-      <button className={s.submit} type="submit" disabled={disabled}>
+      <button
+        className={s.submit}
+        type="submit"
+        disabled={!username || !password}
+      >
         Войти
       </button>
 

@@ -4,7 +4,6 @@ import { RootState } from '../store';
 
 export interface ChatState extends EntityState<IMessage> {
   status: Status;
-  room?: string;
   errorMessage?: string;
   replyMessage?: IMessage;
 }

@@ -11,8 +11,8 @@ export interface IMessage {
 
 export interface IUser {
   id?: number;
-  username: string;
-  password: string;
+  username?: string;
+  password?: string;
 }
 
 export enum ValidationError {

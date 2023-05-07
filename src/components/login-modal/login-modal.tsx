@@ -31,7 +31,7 @@ export const LoginModal = ({ showModal, onClose }: LoginModalProps) => {
   return (
     <Modal isOpen={showModal} onClose={onClose}>
       <form className={s.form}>
-        <h4>Регистрация</h4>
+        <h4 className={s.title}>Регистрация</h4>
         <Input
           placeholder="Имя пользователя"
           value={username}
@@ -43,7 +43,7 @@ export const LoginModal = ({ showModal, onClose }: LoginModalProps) => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <button type="submit" onClick={handleAddUser}>
+        <button className={s.submit} type="submit" onClick={handleAddUser}>
           ОК
         </button>
       </form>

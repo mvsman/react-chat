@@ -1,0 +1,15 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 0 20px;
+
+  .title {
+    text-align: center;
+  }
+
+  .submit {
+    padding: 5px 0;
+    cursor: pointer;
+  }
+}

@@ -11,9 +11,6 @@ export const chatSlice = createSlice({
     status: 'idle',
   }),
   reducers: {
-    setChatRoom: (state, action: PayloadAction<string>) => {
-      state.room = action.payload;
-    },
     setReplyMessage: (state, action: PayloadAction<number>) => {
       const parentId = state.entities[action.payload]?.id;
       const parentMessage = Object.values(state.entities).find(
