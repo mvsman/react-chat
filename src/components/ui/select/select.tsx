@@ -1,8 +1,8 @@
-import { SelectHTMLAttributes } from 'react';
+import { memo, SelectHTMLAttributes } from 'react';
 
 import s from './select.module.scss';
 
-interface SelectOption {
+export interface SelectOption {
   label: string;
   value: string;
 }
@@ -13,7 +13,7 @@ interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   options: SelectOption[];
 }
 
-export const Select = ({ id, label, options, ...props }: SelectProps) => {
+export const Select = memo(({ id, label, options, ...props }: SelectProps) => {
   return (
     <label className={s.field} htmlFor={id}>
       {label && <span>{label}</span>}
@@ -26,4 +26,4 @@ export const Select = ({ id, label, options, ...props }: SelectProps) => {
       </select>
     </label>
   );
-};
+});

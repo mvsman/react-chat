@@ -1,4 +1,4 @@
-import { FormEvent, useState } from 'react';
+import { ChangeEvent, FormEvent, useCallback, useState } from 'react';
 
 import { Modal } from '../ui/modal/modal';
 import { Input } from '../ui/input/input';
@@ -21,14 +21,22 @@ export const LoginModal = ({ showModal, onClose }: LoginModalProps) => {
 
   const handleAddUser = (e: FormEvent) => {
     e.preventDefault();
-    dispatch(addUser({ username, password }))
-      .unwrap()
-      .then(() => {
-        if (!errorMessage) {
-          onClose();
-        }
-      });
+    dispatch(addUser({ username, password })).unwrap().then(onClose);
   };
+
+  const handleChangeUsername = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      setUsername(e.target.value);
+    },
+    []
+  );
+
+  const handleChangePassword = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      setPassword(e.target.value);
+    },
+    []
+  );
 
   return (
     <Modal isOpen={showModal} onClose={onClose}>
@@ -37,13 +45,13 @@ export const LoginModal = ({ showModal, onClose }: LoginModalProps) => {
         <Input
           placeholder="Имя пользователя"
           value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          onChange={handleChangeUsername}
         />
         <Input
           type="password"
           placeholder="Пароль"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={handleChangePassword}
         />
         <button className={s.submit} type="submit" onClick={handleAddUser}>
           ОК

@@ -1,17 +1,11 @@
-import { ChangeEvent, FormEvent, useState } from 'react';
-import cn from 'classnames';
+import { ChangeEvent, FormEvent, useCallback, useState } from 'react';
 
-import { useAppDispatch, useAppSelector } from '../../store/store';
-import {
-  getUserErrorSigninMessage,
-  checkUserIsRegistered,
-} from '../../store/user';
-import { Input } from '../ui/input/input';
-import { Select } from '../ui/select/select';
+import { useAppDispatch } from '../../store/store';
+import { checkUserIsRegistered } from '../../store/user';
+import { SelectOption } from '../ui/select/select';
+import { LoginFormView } from './login-form-view';
 
-import s from './login-form.module.scss';
-
-const options = [
+const options: SelectOption[] = [
   {
     label: 'Комната 1',
     value: 'room1',
@@ -27,31 +21,34 @@ const options = [
 ];
 
 interface LoginFormProps {
-  className?: string;
   onOpenModal: () => void;
 }
 
-export const LoginForm = ({ className, onOpenModal }: LoginFormProps) => {
+export const LoginForm = ({ onOpenModal }: LoginFormProps) => {
   const dispatch = useAppDispatch();
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [room, setRoom] = useState<string>(options[0].value);
 
-  const errorMessage = useAppSelector(getUserErrorSigninMessage);
+  const handleChangeUsername = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      setUsername(e.target.value);
+    },
+    []
+  );
 
-  const onChangeUsername = (e: ChangeEvent<HTMLInputElement>) => {
-    setUsername(e.target.value);
-  };
+  const handleChangePassword = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      setPassword(e.target.value);
+    },
+    []
+  );
 
-  const onChangePassword = (e: ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.target.value);
-  };
-
-  const onChangeRoom = (e: ChangeEvent<HTMLSelectElement>) => {
+  const handleChangeRoom = useCallback((e: ChangeEvent<HTMLSelectElement>) => {
     setRoom(e.target.value);
-  };
+  }, []);
 
-  const onRoomEntry = (e: FormEvent) => {
+  const handleRoomEntry = (e: FormEvent) => {
     e.preventDefault();
     dispatch(checkUserIsRegistered({ username, password }))
       .unwrap()
@@ -62,41 +59,16 @@ export const LoginForm = ({ className, onOpenModal }: LoginFormProps) => {
   };
 
   return (
-    <form className={cn(s.form, className)} onSubmit={onRoomEntry}>
-      <Input
-        label="Имя пользователя"
-        id="username"
-        value={username}
-        onChange={onChangeUsername}
-      />
-
-      <Input
-        label="Пароль"
-        id="password"
-        type="password"
-        value={password}
-        onChange={onChangePassword}
-      />
-
-      <Select
-        label="Выберите комнату"
-        options={options}
-        value={room}
-        onChange={onChangeRoom}
-      />
-
-      <button
-        className={s.submit}
-        type="submit"
-        disabled={!username || !password}
-      >
-        Войти
-      </button>
-
-      <button className={s.reg} type="button" onClick={onOpenModal}>
-        Нет аккаунта? Зарегистрироваться
-      </button>
-      {errorMessage && <span className={s.error}>{errorMessage}</span>}
-    </form>
+    <LoginFormView
+      username={username}
+      password={password}
+      room={room}
+      options={options}
+      onOpenModal={onOpenModal}
+      onChangeUsername={handleChangeUsername}
+      onChangePassword={handleChangePassword}
+      onChangeRoom={handleChangeRoom}
+      onRoomEntry={handleRoomEntry}
+    />
   );
 };
