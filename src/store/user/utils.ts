@@ -2,6 +2,7 @@ import { IUser, Status } from '../../schema/schema';
 
 export interface UserState extends IUser {
   status: Status;
-  errorMessage?: string;
+  errorSigninMessage?: string;
+  errorRegistrationMessage?: string;
   userIsRegistered: boolean;
 }

@@ -2,7 +2,10 @@ import { ChangeEvent, FormEvent, useState } from 'react';
 import cn from 'classnames';
 
 import { useAppDispatch, useAppSelector } from '../../store/store';
-import { getUserErrorMessage, checkUserIsRegistered } from '../../store/user';
+import {
+  getUserErrorSigninMessage,
+  checkUserIsRegistered,
+} from '../../store/user';
 import { Input } from '../ui/input/input';
 import { Select } from '../ui/select/select';
 
@@ -34,7 +37,7 @@ export const LoginForm = ({ className, onOpenModal }: LoginFormProps) => {
   const [password, setPassword] = useState<string>('');
   const [room, setRoom] = useState<string>(options[0].value);
 
-  const errorMessage = useAppSelector(getUserErrorMessage);
+  const errorMessage = useAppSelector(getUserErrorSigninMessage);
 
   const onChangeUsername = (e: ChangeEvent<HTMLInputElement>) => {
     setUsername(e.target.value);

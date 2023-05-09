@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent } from 'react';
+import { ChangeEvent, FormEvent, KeyboardEvent } from 'react';
 import { chatActions, addMessage } from '../../store/chat';
 import { messageActions } from '../../store/message';
 import { useAppDispatch } from '../../store/store';
@@ -30,12 +30,19 @@ export const ChatForm = () => {
     dispatch(addMessage());
   };
 
+  const handleSubmitByEnter = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.code === 'Enter') {
+      dispatch(addMessage());
+    }
+  };
+
   return (
     <ChatFormView
       onRemoveReplyMessage={handleRemoveReplyMessage}
       onChangeText={handleChangeText}
       onChangeFile={handleChangeFile}
       onSubmit={handleSubmit}
+      onSubmitByEnter={handleSubmitByEnter}
     />
   );
 };

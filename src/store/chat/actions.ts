@@ -6,15 +6,6 @@ import { messageActions } from '../message';
 import { AsyncThunkConfig } from '../store';
 import { chatActions } from './slice';
 
-export const messagesReceived = createAsyncThunk<IMessage[], void>(
-  'chat/messagesReceived',
-  async () => {
-    const messages = await roomDB.messages.toArray();
-
-    return messages;
-  }
-);
-
 export const addMessage = createAsyncThunk<IMessage, void, AsyncThunkConfig>(
   'chat/addMessage',
   async (_, { rejectWithValue, getState, dispatch }) => {

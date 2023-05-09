@@ -19,18 +19,19 @@ export const userSlice = createSlice({
     builder
       .addCase(addUser.rejected, (state, action) => {
         state.status = 'error';
-        state.errorMessage = action.payload;
+        state.errorRegistrationMessage = action.payload;
       })
       .addCase(addUser.fulfilled, (state) => {
         state.status = 'success';
       })
       .addCase(addUser.pending, (state) => {
         state.status = 'loading';
+        state.errorRegistrationMessage = '';
       })
 
       .addCase(checkUserIsRegistered.rejected, (state, action) => {
         state.status = 'error';
-        state.errorMessage = action.payload;
+        state.errorSigninMessage = action.payload;
       })
       .addCase(checkUserIsRegistered.fulfilled, (state, action) => {
         state.status = 'success';
@@ -38,7 +39,7 @@ export const userSlice = createSlice({
       })
       .addCase(checkUserIsRegistered.pending, (state) => {
         state.status = 'loading';
-        state.errorMessage = '';
+        state.errorSigninMessage = '';
         state.userIsRegistered = false;
       });
   },

@@ -1,22 +1,24 @@
 import {
   ChangeEventHandler,
   FormEventHandler,
+  KeyboardEventHandler,
   useCallback,
   useRef,
 } from 'react';
 import { Reply } from '../reply/reply';
 import { UploadButton } from '../upload-button/upload-button';
-
-import s from './chat-form.module.scss';
 import { useAppSelector } from '../../store/store';
 import { getMessageText } from '../../store/message';
 import { getReplyMessage } from '../../store/chat';
+
+import s from './chat-form.module.scss';
 
 interface ChatFormViewProps {
   onRemoveReplyMessage: () => void;
   onChangeText: ChangeEventHandler<HTMLTextAreaElement>;
   onChangeFile: ChangeEventHandler<HTMLInputElement>;
   onSubmit: FormEventHandler;
+  onSubmitByEnter: KeyboardEventHandler;
 }
 
 export const ChatFormView = ({
@@ -24,6 +26,7 @@ export const ChatFormView = ({
   onChangeText,
   onChangeFile,
   onSubmit,
+  onSubmitByEnter,
 }: ChatFormViewProps) => {
   const fileRef = useRef<HTMLInputElement>(null);
   const text = useAppSelector(getMessageText);
@@ -42,6 +45,7 @@ export const ChatFormView = ({
         placeholder="Введите ваше сообщение"
         value={text}
         onChange={onChangeText}
+        onKeyDown={onSubmitByEnter}
       />
       <div className={s.buttons}>
         <UploadButton

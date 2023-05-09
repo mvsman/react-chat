@@ -19,5 +19,6 @@ export enum ValidationError {
   USERNAME_IS_BUSY = 'Пользователь с таким именем уже существует!',
   INCORRECT_USERNAME = 'Пользователь с таким именем не существует!',
   INCORRECT_PASSWORD = 'Неверный пароль!',
+  INCORRECT_DATA = 'Некорректные данные',
   ERROR = 'Ошибка!',
 }

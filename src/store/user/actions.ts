@@ -10,6 +10,10 @@ export const addUser = createAsyncThunk<void, IUser, AsyncThunkConfig>(
   'user/addUser',
   async ({ username, password }: IUser, { rejectWithValue }) => {
     try {
+      if (!username?.trim() || !password?.trim()) {
+        return rejectWithValue(ValidationError.INCORRECT_DATA);
+      }
+
       const users = await usersDB.users.toArray();
 
       const hasUser = users.some((u) => u.username === username);

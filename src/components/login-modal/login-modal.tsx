@@ -3,7 +3,7 @@ import { FormEvent, useState } from 'react';
 import { Modal } from '../ui/modal/modal';
 import { Input } from '../ui/input/input';
 import { useAppDispatch, useAppSelector } from '../../store/store';
-import { addUser, getUserErrorMessage } from '../../store/user';
+import { addUser, getUserErrorRegistrationMessage } from '../../store/user';
 
 import s from './login-modal.module.scss';
 
@@ -17,15 +17,17 @@ export const LoginModal = ({ showModal, onClose }: LoginModalProps) => {
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
 
-  const errorMessage = useAppSelector(getUserErrorMessage);
+  const errorMessage = useAppSelector(getUserErrorRegistrationMessage);
 
   const handleAddUser = (e: FormEvent) => {
     e.preventDefault();
-    dispatch(addUser({ username, password }));
-
-    if (!errorMessage) {
-      onClose();
-    }
+    dispatch(addUser({ username, password }))
+      .unwrap()
+      .then(() => {
+        if (!errorMessage) {
+          onClose();
+        }
+      });
   };
 
   return (
@@ -46,6 +48,7 @@ export const LoginModal = ({ showModal, onClose }: LoginModalProps) => {
         <button className={s.submit} type="submit" onClick={handleAddUser}>
           ОК
         </button>
+        {errorMessage && <span className={s.error}>{errorMessage}</span>}
       </form>
     </Modal>
   );
